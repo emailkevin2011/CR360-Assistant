@@ -1,7 +1,7 @@
 
 export enum ConversationRole {
   USER = 'user',
-  MODEL = 'model',
+  MODEL = 'atlas',
 }
 
 export interface ConversationEntry {

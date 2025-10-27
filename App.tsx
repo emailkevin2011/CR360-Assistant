@@ -1,5 +1,6 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react';
-import { GoogleGenAI, LiveSession, LiveServerMessage, Modality } from '@google/genai';
+// FIX: 'LiveSession' is not an exported member of '@google/genai'. Using 'any' as a workaround since no specific type is exported for the live session object.
+import { GoogleGenAI, LiveServerMessage, Modality } from '@google/genai';
 import { ConversationEntry, ConversationRole, FunctionCallLog, Status } from './types';
 import { createBlob, decode, decodeAudioData } from './utils/audio';
 import { SYSTEM_INSTRUCTION, TOOL_DECLARATIONS } from './services/geminiService';
@@ -14,7 +15,8 @@ const App: React.FC = () => {
   const [hasSelectedApiKey, setHasSelectedApiKey] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  const sessionRef = useRef<LiveSession | null>(null);
+  // FIX: 'LiveSession' is not an exported member of '@google/genai'. Using 'any' as a workaround since no specific type is exported for the live session object.
+  const sessionRef = useRef<any | null>(null);
   const inputAudioContextRef = useRef<AudioContext | null>(null);
   const outputAudioContextRef = useRef<AudioContext | null>(null);
   const processorRef = useRef<ScriptProcessorNode | null>(null);
@@ -164,7 +166,7 @@ const App: React.FC = () => {
                 setStatus(Status.SPEAKING);
               }
 
-              const base64Audio = message.serverContent?.modelTurn?.parts[0]?.inlineData.data;
+              const base64Audio = message.serverContent?.modelTurn?.parts?.[0]?.inlineData?.data;
               if (base64Audio) {
                 const outputCtx = outputAudioContextRef.current!;
                 nextStartTimeRef.current = Math.max(nextStartTimeRef.current, outputCtx.currentTime);
@@ -214,10 +216,10 @@ const App: React.FC = () => {
               }
             }
           },
-          onerror: (e: Error) => {
+          onerror: (e: ErrorEvent) => {
             console.error('API Error:', e);
-            // FIX: The `onerror` callback receives an `Error` object, not an `ErrorEvent`. Access `e.message` directly.
-            setErrorMessage(`API Error: ${e.message}. The API key might be invalid. Please select a valid key.`);
+            const message = e.message || 'An unknown API error occurred.';
+            setErrorMessage(`API Error: ${message}. The API key might be invalid. Please select a valid key.`);
             setStatus(Status.ERROR);
             setHasSelectedApiKey(false);
             stopConversation();
@@ -350,13 +352,13 @@ const App: React.FC = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         <div className="bg-gray-800 p-4 rounded-lg shadow-lg">
           <h2 className="text-xl font-semibold mb-4 border-b border-gray-700 pb-2">Conversation</h2>
-          <div className="h-96 overflow-y-auto pr-2">
+          <div className="h-[60vh] overflow-y-auto pr-2">
             {transcript.length > 0 ? renderConversation() : <p className="text-gray-400">Conversation will appear here...</p>}
           </div>
         </div>
         <div className="bg-gray-800 p-4 rounded-lg shadow-lg">
           <h2 className="text-xl font-semibold mb-4 border-b border-gray-700 pb-2">Function Calls</h2>
-          <div className="h-96 overflow-y-auto pr-2">
+          <div className="h-[60vh] overflow-y-auto pr-2">
             {functionCalls.length > 0 ? renderFunctionCalls() : <p className="text-gray-400">Tool activity will be logged here...</p>}
           </div>
         </div>

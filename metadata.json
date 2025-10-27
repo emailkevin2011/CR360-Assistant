@@ -1,0 +1,7 @@
+{
+  "name": "ClaimRoute 360 AI Assistant",
+  "description": "An interactive AI assistant for the ClaimRoute 360 platform. Users can speak to the assistant in real-time to manage claims, schedules, and other tasks using the Gemini Live API.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}
